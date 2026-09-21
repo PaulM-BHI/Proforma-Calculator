@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intrathecal Practice Optimization Strategy</title>
+
+<style>
+
+/* Standalone local styles: no external CSS/CDN dependencies */
+:root {
+  --bhi-navy: #0F2C59;
+  --bhi-cyan: #00A896;
+  --bhi-bg: #F8FAFC;
+}
+
+body {
+  background-color: var(--bhi-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.flex { display: flex; }
+.grid { display: grid; }
+.block { display: block; }
+.flex-col { flex-direction: column; }
+.flex-shrink-0 { flex-shrink: 0; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.w-full { width: 100%; }
+.w-4 { width: 1rem; }
+.w-7 { width: 1.75rem; }
+.w-12 { width: 3rem; }
+.w-16 { width: 4rem; }
+.w-20 { width: 5rem; }
+.h-2 { height: .5rem; }
+.h-4 { height: 1rem; }
+.h-7 { height: 1.75rem; }
+.h-12 { height: 3rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mb-1 { margin-bottom: .25rem; }
+.mb-1\.5 { margin-bottom: .375rem; }
+.mb-2 { margin-bottom: .5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-5 { margin-bottom: 1.25rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-10 { margin-bottom: 2.5rem; }
+.mt-0\.5 { margin-top: .125rem; }
+.mt-1 { margin-top: .25rem; }
+.mt-2 { margin-top: .5rem; }
+.mt-4 { margin-top: 1rem; }
+.-mt-2 { margin-top: -.5rem; }
+.p-1 { padding: .25rem; }
+.p-2 { padding: .5rem; }
+.p-2\.5 { padding: .625rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+.pt-2 { padding-top: .5rem; }
+.pb-2 { padding-bottom: .5rem; }
+.pb-6 { padding-bottom: 1.5rem; }
+.px-2 { padding-left: .5rem; padding-right: .5rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+.py-2 { padding-top: .5rem; padding-bottom: .5rem; }
+.py-3 { padding-top: .75rem; padding-bottom: .75rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.gap-1 { gap: .25rem; }
+.gap-2 { gap: .5rem; }
+.gap-3 { gap: .75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
+
+.text-center { text-align: center; }
+.text-xs { font-size: .75rem; line-height: 1rem; }
+.text-sm { font-size: .875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.font-black { font-weight: 900; }
+.leading-tight { line-height: 1.25; }
+.uppercase { text-transform: uppercase; }
+.tracking-wide { letter-spacing: .025em; }
+.tracking-wider { letter-spacing: .05em; }
+.tracking-widest { letter-spacing: .1em; }
+.text-white { color: #fff; }
+.text-gray-300 { color: #D1D5DB; }
+.text-gray-400 { color: #9CA3AF; }
+.text-gray-500 { color: #6B7280; }
+.text-gray-600 { color: #4B5563; }
+.text-gray-700 { color: #374151; }
+.text-gray-800 { color: #1F2937; }
+.bg-white { background-color: #fff; }
+.bg-gray-50 { background-color: #F9FAFB; }
+.border { border-width: 1px; border-style: solid; }
+.border-b { border-bottom-width: 1px; border-bottom-style: solid; }
+.border-b-2 { border-bottom-width: 2px; border-bottom-style: solid; }
+.border-gray-100 { border-color: #F3F4F6; }
+.border-gray-200 { border-color: #E5E7EB; }
+.border-gray-300 { border-color: #D1D5DB; }
+.border-white { border-color: #fff; }
+.border-opacity-15 { border-color: rgba(255,255,255,.15); }
+.bg-opacity-5 { background-color: rgba(255,255,255,.05); }
+.rounded { border-radius: .25rem; }
+.rounded-md { border-radius: .375rem; }
+.rounded-lg { border-radius: .5rem; }
+.rounded-xl { border-radius: .75rem; }
+.rounded-2xl { border-radius: 1rem; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0,0,0,.05); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); }
+.cursor-pointer { cursor: pointer; }
+.transition-transform { transition-property: transform; transition-duration: .15s; transition-timing-function: cubic-bezier(.4,0,.2,1); }
+.transform { transform: translate(0,0) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1); }
+.active\:scale-95:active { transform: scale(.95); }
+.focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
+
+.bhi-card { background: #FFFFFF; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07); }
+input[type=range] { accent-color: var(--bhi-cyan); }
+.proc-card { cursor: pointer; transition: all 0.15s ease; border: 2px solid #E2E8F0; }
+.proc-card:hover { border-color: var(--bhi-cyan); }
+.proc-card.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; }
+.rtm-opt-card { cursor: pointer; transition: all 0.15s ease; border: 2px solid #E2E8F0; }
+.rtm-opt-card:hover { border-color: var(--bhi-cyan); }
+.rtm-opt-card.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; }
+.provider-btn { cursor: pointer; transition: all 0.15s ease; border: 1.5px solid #CBD5E1; }
+.provider-btn.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; color: var(--bhi-navy); font-weight: 700; }
+
+@media (min-width: 640px) {
+  .sm\:flex-row { flex-direction: row; }
+  .sm\:items-center { align-items: center; }
+  .sm\:w-auto { width: auto; }
+}
+@media (min-width: 768px) {
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md\:p-8 { padding: 2rem; }
+  .md\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
+  .md\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+  .md\:text-5xl { font-size: 3rem; line-height: 1; }
+  .md\:text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+  .md\:text-sm { font-size: .875rem; line-height: 1.25rem; }
+}
+@media (min-width: 1024px) {
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media print {
+body { background: white !important; padding: 0 !important; }
+.no-print { display: none !important; }
+.bhi-card { box-shadow: none !important; border: 1px solid #E2E8F0 !important; break-inside: avoid; }
+}
+
+</style>
+</head>
+<body class="p-4 md:p-8">
+
+<!-- HEADER -->
+<header class="flex items-center p-4 mb-6 bg-white bhi-card">
+<div class="flex items-center gap-3">
+<!-- Medical Infusion Pump Icon -->
+<div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm" style="background-color: var(--bhi-navy);">
+<svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="8.5" stroke="#FFFFFF" stroke-width="1.8" />
+<circle cx="12" cy="12" r="3.2" stroke="#00A896" stroke-width="1.8" fill="#00A896" fill-opacity="0.3" />
+<circle cx="12" cy="12" r="1.2" fill="#FFFFFF" />
+<path d="M19 8.5C20.5 7.5 21.5 6 22 4" stroke="#00A896" stroke-width="1.8" stroke-linecap="round" />
+<path d="M7 4.5C8.5 3.5 10.2 3 12 3" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="1 2" />
+</svg>
+</div>
+<div>
+<h1 class="text-xl md:text-2xl font-bold leading-tight" style="color: var(--bhi-navy)">Intrathecal Practice Optimization Strategy</h1>
+<p class="text-xs text-gray-500 font-medium">Clinical Resource Allocation & Practice Growth Model</p>
+</div>
+</div>
+</header>
+
+<!-- TOP 3 PILLARS GRID -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+<!-- 1. CURRENT REFILL PROFILE -->
+<div class="p-6 bhi-card flex flex-col justify-between">
+<div>
+<h2 class="text-lg font-bold mb-4 pb-2 border-b-2 tracking-wide" style="border-color: var(--bhi-cyan); color: var(--bhi-navy);">1. CURRENT REFILL PROFILE</h2>
+
+<div class="mb-5">
+<div class="flex justify-between items-center mb-1">
+<label class="text-sm font-semibold text-gray-700">Active Pump Patients</label>
+<input type="number" id="input-patients-num" min="1" max="500" value="25" class="w-20 p-1 text-center font-bold text-base border rounded-md focus:outline-none" style="color: var(--bhi-navy);">
+</div>
+<input type="range" id="input-patients-slider" min="1" max="200" value="25" class="w-full h-2 rounded-lg cursor-pointer">
+</div>
+
+<div class="mb-4">
+<label class="block text-sm font-semibold text-gray-700 mb-1">Avg Refills / Patient / Year</label>
+<select id="input-refills-year" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg bg-white">
+<option value="2">2 Refills (Every 180 Days)</option>
+<option value="4">4 Refills (Every 90 Days)</option>
+<option value="6" selected>6 Refills (Every 60 Days)</option>
+<option value="12">12 Refills (Monthly)</option>
+</select>
+</div>
+
+<div class="mb-4">
+<label class="block text-sm font-semibold text-gray-700 mb-1">Total Chair Time per Refill</label>
+<select id="input-chair-time" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg bg-white">
+<option value="15">15 Minutes</option>
+<option value="20">20 Minutes</option>
+<option value="30" selected>30 Minutes</option>
+</select>
+</div>
+
+<div class="mb-4">
+<label class="block text-sm font-semibold text-gray-700 mb-1">Average Refill Kit Cost ($)</label>
+<input type="number" id="input-kit-cost" value="20" min="0" step="5" class="w-full p-2 border border-gray-300 rounded-lg font-medium">
+</div>
+
+<!-- PROVIDER MODEL TOGGLE -->
+<div class="mb-4">
+<label class="block text-sm font-semibold text-gray-700 mb-1.5">Refill Provider Model</label>
+<div class="grid grid-cols-2 gap-2">
+<button type="button" id="btn-prov-md" class="provider-btn selected py-2 px-2 text-xs rounded-lg text-center font-medium" onclick="toggleProviderModel('md')">
+Physician (62370)
+</button>
+<button type="button" id="btn-prov-app" class="provider-btn py-2 px-2 text-xs rounded-lg text-center font-medium text-gray-600" onclick="toggleProviderModel('app')">
+APRN / Staff (62369)
+</button>
+</div>
+</div>
+
+<div class="mb-4">
+<label class="block text-sm font-semibold text-gray-700 mb-1">Pump Refill Charge ($) <span class="text-xs font-normal text-gray-500" id="refill-cpt-label">CPT 62370</span></label>
+<input type="number" id="input-refill-charge" value="87" min="0" step="1" class="w-full p-2 border border-gray-300 rounded-lg font-medium">
+</div>
+</div>
+
+<div class="mt-4 p-4 rounded-xl bg-gray-50 border border-gray-200">
+<p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Current Net Annual Refill Revenue</p>
+<p id="current-annual-revenue" class="text-2xl font-extrabold mt-1" style="color: var(--bhi-navy);">$10,050</p>
+</div>
+</div>
+
+<!-- 2. CLINICAL CAPACITY RECOVERED -->
+<div class="p-6 bhi-card flex flex-col justify-between">
+<div>
+<h2 class="text-lg font-bold mb-4 pb-2 border-b-2 tracking-wide" style="border-color: var(--bhi-cyan); color: var(--bhi-navy);">2. CAPACITY RECOVERED</h2>
+
+<div class="bg-gray-50 border border-gray-100 p-5 rounded-xl mb-4 text-center">
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Clinical Hours Tied Up</p>
+<div id="total-hours" class="text-2xl md:text-3xl font-black py-3 px-4 rounded-lg text-white shadow-sm" style="background-color: var(--bhi-cyan);">75.0 HOURS / YEAR</div>
+</div>
+
+<div class="bg-gray-50 border border-gray-100 p-5 rounded-xl mb-6 text-center">
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Equivalent Full Clinic Days Unlocked</p>
+<div id="total-days" class="text-2xl md:text-3xl font-black py-3 px-4 rounded-lg text-white shadow-sm" style="background-color: var(--bhi-cyan);">9.4 FULL DAYS</div>
+</div>
+
+<div class="p-4 rounded-xl border border-gray-200">
+<div class="flex justify-between items-center mb-2">
+<label class="text-xs font-bold text-gray-600 uppercase tracking-wider">Pump Patients Transitioned</label>
+<div class="flex items-center gap-1">
+<input type="number" id="input-transition-num" min="0" max="25" step="1" value="25" class="w-16 p-1 text-center font-extrabold text-base border rounded-md focus:outline-none" style="color: var(--bhi-cyan);">
+<span class="font-extrabold text-sm" style="color: var(--bhi-cyan);">Pts</span>
+</div>
+</div>
+<input type="range" id="input-transition-slider" min="0" max="25" step="1" value="25" class="w-full h-2 rounded-lg cursor-pointer">
+<p class="text-xs text-gray-400 mt-2">Adjust to model a partial transition of high-travel or mobility-challenged patients.</p>
+</div>
+</div>
+</div>
+
+<!-- 3. REALLOCATED OPPORTUNITY -->
+<div class="p-6 bhi-card flex flex-col justify-between">
+<div>
+<h2 class="text-lg font-bold mb-4 pb-2 border-b-2 tracking-wide" style="border-color: var(--bhi-cyan); color: var(--bhi-navy);">3. REALLOCATED OPPORTUNITY</h2>
+
+<p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Select backfill procedure:</p>
+
+<!-- PHYSICIAN LIST -->
+<div class="space-y-2" id="group-md">
+<div class="proc-card selected p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(127, 30, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">New Patient Consultations</p>
+<p class="text-xs text-gray-500">CPT 99203 • 30m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$127</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(265, 20, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">In-Office Injections / Blocks</p>
+<p class="text-xs text-gray-500">CPT 64483 • 20m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$265</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(190, 45, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">Fluoro Suite / ASC Procedures</p>
+<p class="text-xs text-gray-500">CPT 64493 • 45m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$190</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(142, 45, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">Diagnostic Testing (EMG/NCS)</p>
+<p class="text-xs text-gray-500">CPT 95909 + 95886 • 45m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$142</span>
+</div>
+</div>
+
+<!-- APRN / STAFF LIST -->
+<div class="space-y-2" id="group-app" style="display: none;">
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(105, 20, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">Established Patient E/M Follow-Up</p>
+<p class="text-xs text-gray-500">CPT 99213/99214 • 20m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$105</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(85, 15, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">In-Office Trigger Point Injections</p>
+<p class="text-xs text-gray-500">CPT 20552 • 15m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$85</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(98, 20, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">Peripheral Joint & Bursa Injections</p>
+<p class="text-xs text-gray-500">CPT 20610 • 20m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$98</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(120, 20, false, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">Peripheral Nerve / Field Blocks</p>
+<p class="text-xs text-gray-500">CPT 64405 • 20m slot</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$120</span>
+</div>
+
+<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(36, 60, true, this)">
+<div>
+<p class="text-sm font-bold text-gray-800">Staff Hours Reallocated (New Tasks)</p>
+<p class="text-xs text-gray-500">Prior Auth, Triage & Flow • Estimated capacity value (~$36/hr basis)</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$36/hr</span>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- 4. SUREMED RTM PROGRAM -->
+<div class="p-6 bhi-card mb-6">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-2 border-b-2" style="border-color: var(--bhi-cyan);">
+<h2 class="text-lg font-bold tracking-wide" style="color: var(--bhi-navy);">4. SUREMED RTM PROGRAM</h2>
+<div id="rtm-header-lift" class="text-sm font-extrabold" style="color: var(--bhi-cyan);">Estimated Lift: $0/year (Unselected)</div>
+</div>
+
+<div class="text-xs text-gray-600 mb-4">
+<div>Remote Therapeutic Monitoring (CPT 98977, 98978, 98980, 98981, 98985)</div>
+<div class="text-gray-500 mt-0.5">Provides continuous therapy adherence and monitoring.</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Option 1: Standard (No RTM) -->
+<div id="rtm-opt-none" class="rtm-opt-card selected p-4 rounded-lg flex items-center justify-between" onclick="setRtmOption(false)">
+<div>
+<p class="text-sm font-bold text-gray-800">Standard Practice Protocol</p>
+<p class="text-xs text-gray-500 mt-0.5">In-office follow-up only</p>
+<p class="text-xs text-gray-400">No remote monitoring billing</p>
+</div>
+<span class="font-bold text-sm text-gray-400">$0/mo</span>
+</div>
+
+<!-- Option 2: Suremed RTM Enabled -->
+<div id="rtm-opt-active" class="rtm-opt-card p-4 rounded-lg flex items-center justify-between" onclick="setRtmOption(true)">
+<div>
+<p class="text-sm font-bold text-gray-800">Attach Suremed RTM Program</p>
+<p class="text-xs text-gray-500 mt-0.5">CPT 98977 • CPT 98980</p>
+<p class="text-xs text-gray-400">Remote adherence telemetry</p>
+</div>
+<span class="font-extrabold text-sm" style="color: var(--bhi-cyan);">+$70/pt/mo</span>
+</div>
+</div>
+</div>
+
+<!-- ANNUAL PRACTICE VALUE SUMMARY -->
+<div class="p-6 rounded-2xl shadow-lg text-white mb-6" style="background-color: var(--bhi-navy);">
+<p class="text-xs uppercase tracking-widest text-center mb-6 font-bold text-gray-300">Annual Practice Value Summary</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center mb-6 border-b border-white border-opacity-15 pb-6">
+<div class="p-4 rounded-xl bg-white bg-opacity-5">
+<p class="text-xs text-gray-300 uppercase tracking-wider mb-1">New Billable Slots Created</p>
+<p id="summary-new-slots" class="text-3xl font-extrabold">150</p>
+</div>
+<div class="p-4 rounded-xl bg-white bg-opacity-5">
+<p id="summary-opportunity-label" class="text-xs text-gray-300 uppercase tracking-wider mb-1">Gross Clinical Opportunity</p>
+<p id="summary-opportunity-revenue" class="text-3xl font-extrabold">$19,050</p>
+</div>
+</div>
+<p class="text-xs text-gray-400 text-center -mt-2 mb-4">Staff reallocation is valued at an estimated $36/hr of recovered capacity; it does not assume elimination of the staff position or return of the full salary to the bottom line.</p>
+
+<div class="text-center pt-2">
+<p class="text-xs uppercase tracking-wider text-gray-300 mb-2">Estimated Bottom-Line Practice Lift</p>
+<p id="summary-practice-lift" class="text-4xl md:text-5xl font-black" style="color: var(--bhi-cyan);">+$9,000</p>
+</div>
+</div>
+
+<!-- QUALITATIVE PRACTICE BURDEN BENEFITS -->
+<div class="p-6 bhi-card mb-6">
+<h3 class="text-base font-bold mb-4 tracking-wide" style="color: var(--bhi-navy);">Operational Efficiencies (Beyond Direct Revenue)</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
+<label class="flex items-center gap-3"><input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--bhi-cyan)"> Eliminates wheelchair & transit schedule delays</label>
+<label class="flex items-center gap-3"><input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--bhi-cyan)"> Physician maintains 100% telemetry & dosing control</label>
+<label class="flex items-center gap-3"><input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--bhi-cyan)"> 24/7 clinical pump on-call triage for off-hour alarms</label>
+<label class="flex items-center gap-3"><input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--bhi-cyan)"> BHI manages compounding, specialty pharmacy, & delivery</label>
+<label class="flex items-center gap-3"><input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--bhi-cyan)"> Payer pre-authorizations coordinated externally</label>
+</div>
+</div>
+
+<!-- EXPORT 1-PAGE BUTTON -->
+<div class="mb-10 text-center no-print">
+<button onclick="window.print()" class="w-full sm:w-auto px-10 py-4 text-white font-bold rounded-2xl shadow-lg transition-transform transform active:scale-95 flex flex-col items-center justify-center mx-auto" style="background-color: var(--bhi-navy);">
+<span class="text-base md:text-lg tracking-wide">Export 1-Page</span>
+<span class="text-xs md:text-sm font-normal text-gray-300 mt-0.5">Practice Summary (PDF)</span>
+</button>
+</div>
+
+<script>
+let currentProcRate = 127;
+let currentProcMinutes = 30;
+let isSalary = false;
+let rtmActive = false;
+
+const currencyFmt = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0
+});
+
+// Cache all inputs/outputs once the page has loaded.
+const inPatientsSlider = document.getElementById('input-patients-slider');
+const inPatientsNum = document.getElementById('input-patients-num');
+const inRefillsYear = document.getElementById('input-refills-year');
+const inChairTime = document.getElementById('input-chair-time');
+const inKitCost = document.getElementById('input-kit-cost');
+const inRefillCharge = document.getElementById('input-refill-charge');
+const inTransitionSlider = document.getElementById('input-transition-slider');
+const inTransitionNum = document.getElementById('input-transition-num');
+
+// Initialize Section 2 to all active pump patients (100%).
+const initialPatients = Math.max(0, parseInt(inPatientsNum.value, 10) || 0);
+inTransitionNum.max = initialPatients;
+inTransitionNum.value = initialPatients;
+inTransitionSlider.max = initialPatients;
+inTransitionSlider.value = initialPatients;
+
+const outCurrentAnnualRevenue = document.getElementById('current-annual-revenue');
+const outTotalHours = document.getElementById('total-hours');
+const outTotalDays = document.getElementById('total-days');
+const outNewSlots = document.getElementById('summary-new-slots');
+const outOpportunityRevenue = document.getElementById('summary-opportunity-revenue');
+const outOpportunityLabel = document.getElementById('summary-opportunity-label');
+const outPracticeLift = document.getElementById('summary-practice-lift');
+const outRtmHeaderLift = document.getElementById('rtm-header-lift');
+
+function toggleProviderModel(model) {
+    const btnMd = document.getElementById('btn-prov-md');
+    const btnApp = document.getElementById('btn-prov-app');
+    const lblCpt = document.getElementById('refill-cpt-label');
+    const groupMd = document.getElementById('group-md');
+    const groupApp = document.getElementById('group-app');
+
+    if (model === 'md') {
+        btnMd.classList.add('selected');
+        btnApp.classList.remove('selected');
+        lblCpt.textContent = 'CPT 62370';
+        groupMd.style.display = 'block';
+        groupApp.style.display = 'none';
+
+        const first = groupMd.querySelector('.proc-card');
+        selectProcedure(127, 30, false, first);
+    } else {
+        btnApp.classList.add('selected');
+        btnMd.classList.remove('selected');
+        lblCpt.textContent = 'CPT 62369';
+        groupMd.style.display = 'none';
+        groupApp.style.display = 'block';
+
+        const first = groupApp.querySelector('.proc-card');
+        selectProcedure(105, 20, false, first);
+    }
+}
+
+function selectProcedure(rate, mins, isSalaryFlag, element) {
+    currentProcRate = Number(rate) || 0;
+    currentProcMinutes = Number(mins) || 1;
+    isSalary = Boolean(isSalaryFlag);
+
+    document.querySelectorAll('.proc-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    if (element) {
+        element.classList.add('selected');
+    }
+
+    calculate();
+}
+
+function setRtmOption(enabled) {
+    rtmActive = Boolean(enabled);
+
+    document.getElementById('rtm-opt-none').classList.toggle('selected', !rtmActive);
+    document.getElementById('rtm-opt-active').classList.toggle('selected', rtmActive);
+
+    calculate();
+}
+
+function syncPatients(fromSlider) {
+    if (fromSlider) {
+        inPatientsNum.value = inPatientsSlider.value;
+    } else {
+        let val = parseInt(inPatientsNum.value, 10);
+        if (!Number.isFinite(val)) val = 0;
+        val = Math.min(Math.max(val, 0), 500);
+        inPatientsNum.value = val;
+        inPatientsSlider.value = Math.min(val, Number(inPatientsSlider.max));
+    }
+    syncTransition(false);
+}
+
+function syncTransition(fromSlider) {
+    const patients = Math.max(0, parseInt(inPatientsNum.value, 10) || 0);
+    const maxPatients = Math.min(patients, 500);
+
+    // The transition control represents an actual patient count, not a percentage.
+    inTransitionSlider.max = maxPatients;
+    inTransitionNum.max = maxPatients;
+
+    if (fromSlider) {
+        inTransitionNum.value = inTransitionSlider.value;
+    } else {
+        let val = parseInt(inTransitionNum.value, 10);
+        if (!Number.isFinite(val)) val = 0;
+        val = Math.min(Math.max(val, 0), maxPatients);
+        inTransitionNum.value = val;
+        inTransitionSlider.value = val;
+    }
+    calculate();
+}
+
+function calculate() {
+    const patients = Math.max(0, parseInt(inPatientsNum.value, 10) || 0);
+    const refillsPerYear = Math.max(0, parseInt(inRefillsYear.value, 10) || 0);
+    const minutesPerRefill = Math.max(0, parseInt(inChairTime.value, 10) || 0);
+    const kitCost = Math.max(0, parseFloat(inKitCost.value) || 0);
+    const refillCharge = Math.max(0, parseFloat(inRefillCharge.value) || 0);
+
+    // Section 2 is now based on an actual number of patients transitioned.
+    const transitionedPatients = Math.min(
+        patients,
+        Math.max(0, parseInt(inTransitionNum.value, 10) || 0)
+    );
+    const transitionPct = patients > 0 ? transitionedPatients / patients : 0;
+
+    // SECTION 1 — CURRENT REFILL PROFILE
+    const totalAnnualRefills = patients * refillsPerYear;
+    const grossRefillRevenue = totalAnnualRefills * refillCharge;
+    const totalKitCost = totalAnnualRefills * kitCost;
+    const currentNetAnnual = grossRefillRevenue - totalKitCost;
+
+    outCurrentAnnualRevenue.textContent = currencyFmt.format(currentNetAnnual);
+
+    // SECTION 2 — CAPACITY RECOVERED
+    const totalHoursClinic = (totalAnnualRefills * minutesPerRefill) / 60;
+    const totalDaysClinic = totalHoursClinic / 8;
+    const hoursRecovered = totalHoursClinic * transitionPct;
+    const daysRecovered = totalDaysClinic * transitionPct;
+
+    outTotalHours.textContent = hoursRecovered.toFixed(1) + ' HOURS / YEAR';
+    outTotalDays.textContent = daysRecovered.toFixed(1) + ' FULL DAYS';
+
+    // SECTION 3 — REALLOCATED OPPORTUNITY
+    let newSlotsCreated = 0;
+    let grossOpportunityRev = 0;
+
+    if (isSalary) {
+        newSlotsCreated = Math.round(hoursRecovered);
+        grossOpportunityRev = hoursRecovered * currentProcRate;
+    } else {
+        const recoveredMinutes = hoursRecovered * 60;
+        newSlotsCreated = Math.floor(recoveredMinutes / currentProcMinutes);
+        grossOpportunityRev = newSlotsCreated * currentProcRate;
+    }
+
+    // SECTION 4 — SUREMED RTM PROGRAM
+    const rtmAnnualPotential = transitionedPatients * 70 * 12;
+    const rtmRevenueApplied = rtmActive ? rtmAnnualPotential : 0;
+
+    if (rtmActive) {
+        outRtmHeaderLift.textContent = 'Active Lift: +' + currencyFmt.format(rtmAnnualPotential) + '/year (' + currencyFmt.format(rtmAnnualPotential / 12) + '/mo)';
+        outRtmHeaderLift.style.color = '#00A896';
+    } else {
+        outRtmHeaderLift.textContent = 'Estimated Potential: +' + currencyFmt.format(rtmAnnualPotential) + '/year (Unselected)';
+        outRtmHeaderLift.style.color = '#9CA3AF';
+    }
+
+    // NET PRACTICE LIFT = procedure revenue + RTM revenue - surrendered refill margin
+    const netRefillMarginSurrendered = currentNetAnnual * transitionPct;
+    const netAnnualPracticeLift = (grossOpportunityRev + rtmRevenueApplied) - netRefillMarginSurrendered;
+
+    // UPDATE SUMMARY
+    outNewSlots.textContent = isSalary ? (newSlotsCreated + ' hrs') : newSlotsCreated;
+    outOpportunityRevenue.textContent = currencyFmt.format(grossOpportunityRev);
+    outOpportunityLabel.textContent = isSalary ? 'Estimated Staff Capacity Value' : 'Gross Clinical Opportunity';
+
+    if (netAnnualPracticeLift >= 0) {
+        outPracticeLift.textContent = '+' + currencyFmt.format(netAnnualPracticeLift);
+        outPracticeLift.style.color = '#00A896';
+    } else {
+        outPracticeLift.textContent = currencyFmt.format(netAnnualPracticeLift);
+        outPracticeLift.style.color = '#EF4444';
+    }
+}
+
+// Sliders and paired number fields.
+inPatientsSlider.addEventListener('input', () => syncPatients(true));
+inPatientsNum.addEventListener('input', () => syncPatients(false));
+inPatientsNum.addEventListener('change', () => syncPatients(false));
+
+inTransitionSlider.addEventListener('input', () => syncTransition(true));
+inTransitionNum.addEventListener('input', () => syncTransition(false));
+inTransitionNum.addEventListener('change', () => syncTransition(false));
+
+// All remaining Section 1 inputs recalculate immediately.
+[inRefillsYear, inChairTime, inKitCost, inRefillCharge].forEach(input => {
+    input.addEventListener('input', calculate);
+    input.addEventListener('change', calculate);
+});
+
+// Initial state.
+calculate();
+</script>
+</body>
+</html>
