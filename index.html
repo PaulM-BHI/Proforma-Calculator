@@ -670,6 +670,7 @@ function buildEmailSummaryHtml() {
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Active pump patients</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.patients}</td></tr>
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Patients transitioned</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.transitionedPatients}</td></tr>
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Clinical capacity recovered</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.hoursRecovered.toFixed(1)} hrs / ${d.daysRecovered.toFixed(1)} days</td></tr>
+      <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Capacity created</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${slots}</td></tr>
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>New billable opportunity</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${money(d.grossOpportunityRev)}</td></tr>
       <tr><td style="padding:8px 10px;"><strong>RTM opportunity</strong></td><td style="padding:8px 10px;text-align:right;">${rtmLine}</td></tr>
     </table>
@@ -677,7 +678,6 @@ function buildEmailSummaryHtml() {
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:#6B5B00;">Estimated Annual Practice Impact</div>
       <div style="font-size:30px;font-weight:800;color:#0F2C59;margin-top:4px;">${lift}</div>
     </div>
-    <p style="margin-bottom:8px;"><strong>Capacity created:</strong> ${slots}</p>
     <div style="height:16px;"></div>
     <p style="margin:8px 0 6px;"><strong>Operational benefits</strong></p>
     <ul style="margin-top:6px;padding-left:22px;">
@@ -753,7 +753,7 @@ function emailBodyText() {
     const d = getSummaryData();
     const lift = (d.netAnnualPracticeLift >= 0 ? '+' : '') + currencyFmt.format(d.netAnnualPracticeLift);
     const intro = `Thank you for taking the time to review our intrathecal practice optimization strategy today.\n\nBased on our discussion, I’ve summarized the projected impact of transitioning your maintenance pump refills to Basic Home Infusion (BHI) for in-home clinical management.`;
-    return `${intro}\n\nIntrathecal Practice Optimization Strategy\n\nPractice Opportunity Summary\nActive pump patients: ${d.patients}\nPatients transitioned: ${d.transitionedPatients}\nClinical capacity recovered: ${d.hoursRecovered.toFixed(1)} hours / ${d.daysRecovered.toFixed(1)} full days\nNew billable opportunity: ${currencyFmt.format(d.grossOpportunityRev)}\nRTM opportunity: ${rtmActive ? '+' + currencyFmt.format(d.rtmRevenueApplied) + '/year' : 'Not selected'}\n\nESTIMATED ANNUAL PRACTICE IMPACT: ${lift}\n\nOperational benefits\n• Eliminates wheelchair & transit schedule delays\n• Physician maintains telemetry & dosing control\n• 24/7 clinical pump on-call triage for off-hour alarms\n• BHI manages compounding, specialty pharmacy, & delivery\n• Payer pre-authorizations coordinated externally\n\nThis is a modeled estimate based on the calculator inputs and selected procedure assumptions.`;
+    return `${intro}\n\nIntrathecal Practice Optimization Strategy\n\nPractice Opportunity Summary\nActive pump patients: ${d.patients}\nPatients transitioned: ${d.transitionedPatients}\nClinical capacity recovered: ${d.hoursRecovered.toFixed(1)} hours / ${d.daysRecovered.toFixed(1)} full days\nCapacity created: ${slots}\nNew billable opportunity: ${currencyFmt.format(d.grossOpportunityRev)}\nRTM opportunity: ${rtmActive ? '+' + currencyFmt.format(d.rtmRevenueApplied) + '/year' : 'Not selected'}\n\nESTIMATED ANNUAL PRACTICE IMPACT: ${lift}\n\nOperational benefits\n• Eliminates wheelchair & transit schedule delays\n• Physician maintains telemetry & dosing control\n• 24/7 clinical pump on-call triage for off-hour alarms\n• BHI manages compounding, specialty pharmacy, & delivery\n• Payer pre-authorizations coordinated externally\n\nThis is a modeled estimate based on the calculator inputs and selected procedure assumptions.`;
 }
 
 function pdfEscape(value) {
@@ -813,6 +813,7 @@ function buildSummaryPdfBlob() {
         ['Active pump patients', String(d.patients)],
         ['Patients transitioned', String(d.transitionedPatients)],
         ['Clinical capacity recovered', `${d.hoursRecovered.toFixed(1)} hrs / ${d.daysRecovered.toFixed(1)} days`],
+        ['Capacity created', slots],
         ['New billable opportunity', money(d.grossOpportunityRev)],
         ['RTM opportunity', rtmLine]
     ];
@@ -833,11 +834,7 @@ function buildSummaryPdfBlob() {
     const liftWidth = lift.length * 9;
     text((W-liftWidth)/2, boxY-47, lift, 20, true, [15,44,89]);
 
-    y = boxY - 78;
-    text(left+18, y, 'Capacity created:', 9.5, true);
-    text(left+104, y, slots, 9.5, false);
-
-    y -= 31;
+    y = boxY - 31;
     text(left+18, y, 'Operational benefits', 11, true);
     y -= 18;
     const bullets = [
