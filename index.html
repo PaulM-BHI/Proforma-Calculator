@@ -665,7 +665,7 @@ function buildEmailSummaryHtml() {
     <div style="font-size:12px;color:#D1D5DB;margin-top:3px;">Clinical Resource Allocation & Practice Growth Model</div>
   </div>
   <div style="padding:20px;border:1px solid #E2E8F0;border-top:0;border-radius:0 0 10px 10px;">
-    <p style="margin-top:0;"><strong>Practice Opportunity Summary</strong></p>
+    <p style="margin-top:18px;"><strong>Practice Opportunity Summary</strong></p>
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Active pump patients</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.patients}</td></tr>
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Patients transitioned</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.transitionedPatients}</td></tr>
@@ -769,45 +769,98 @@ function buildSummaryPdfBlob() {
     const money = value => currencyFmt.format(value);
     const lift = (d.netAnnualPracticeLift >= 0 ? '+' : '') + money(d.netAnnualPracticeLift);
     const rtmLine = rtmActive ? ('+' + money(d.rtmRevenueApplied) + '/year') : 'Not selected';
-    const slots = d.isSalary ? (d.newSlotsCreated + ' staff-capacity hours') : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots';
+    const slots = d.isSalary
+        ? (d.newSlotsCreated + ' staff-capacity hours')
+        : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots';
 
-    // One-page PDF designed to closely match the on-screen Practice Summary.
-    // No email introduction is included here; the introduction is email-only.
-    const W = 612, H = 792, left = 42, right = 42, contentW = W - left - right;
+    // Build the PDF as a visual replica of the on-screen summary card.
+    // Colors intentionally match the calculator CSS so the exported PDF is
+    // readable on white paper: dark text on white, white text only on navy,
+    // and navy text inside the yellow impact callout.
+    const W = 612, H = 792;
+    const margin = 42;
+    const contentW = W - margin * 2;
+    const navy = [15, 44, 89];
+    const cyan = [0, 168, 150];
+    const dark = [31, 41, 55];
+    const gray = [107, 114, 128];
+    const lightGray = [226, 232, 240];
+    const yellow = [255, 247, 204];
+    const yellowBorder = [229, 201, 74];
+    const yellowLabel = [107, 91, 0];
+    const white = [255, 255, 255];
+
     const commands = [];
+    const rgb = c => `${c[0] / 255} ${c[1] / 255} ${c[2] / 255}`;
     const esc = value => pdfEscape(value);
-    const rgb = (r,g,b) => `${r} ${g} ${b}`;
-    const rect = (x,y,w,h,fill,stroke=null,lineW=1) => {
+
+    const rect = (x, y, w, h, fill, stroke = null, lineW = 1) => {
         commands.push('q');
-        if (fill) commands.push(`${rgb(...fill)} rg`);
-        if (stroke) { commands.push(`${rgb(...stroke)} RG`); commands.push(`${lineW} w`); }
+        if (fill) commands.push(`${rgb(fill)} rg`);
+        if (stroke) {
+            commands.push(`${rgb(stroke)} RG`);
+            commands.push(`${lineW} w`);
+        }
         commands.push(`${x} ${y} ${w} ${h} re`);
         commands.push(fill && stroke ? 'B' : fill ? 'f' : 'S');
         commands.push('Q');
     };
-    const text = (x,y,value,size=10,bold=false,color=[31,41,55]) => {
+
+    const text = (x, y, value, size = 10, bold = false, color = dark) => {
         commands.push('BT');
-        commands.push(`${rgb(...color)} rg`);
-        commands.push(`${bold ? '/F2' : '/F1'} ${size} Tf 1 0 0 1 ${x} ${y} Tm (${esc(value)}) Tj`);
+        commands.push(`${rgb(color)} rg`);
+        commands.push(`/${bold ? 'F2' : 'F1'} ${size} Tf`);
+        commands.push(`1 0 0 1 ${x} ${y} Tm`);
+        commands.push(`(${esc(value)}) Tj`);
         commands.push('ET');
     };
-    const line = (x1,y1,x2,y2,color=[229,231,235],width=0.8) => {
-        commands.push('q'); commands.push(`${rgb(...color)} RG`); commands.push(`${width} w`);
-        commands.push(`${x1} ${y1} m ${x2} ${y2} l S`); commands.push('Q');
-    };
-    const rightText = (rightX,y,value,size=10,bold=false,color=[31,41,55]) => {
-        const approx = String(value).length * size * 0.50;
-        text(rightX - approx, y, value, size, bold, color);
+
+    const centeredText = (y, value, size = 10, bold = false, color = dark) => {
+        // Approximate Helvetica width for predictable centering without an external font library.
+        const factor = bold ? 0.56 : 0.52;
+        const width = String(value).length * size * factor;
+        text(Math.max(margin, (W - width) / 2), y, value, size, bold, color);
     };
 
-    // Header
-    rect(0, H-86, W, 86, [15,44,89]);
-    text(left, H-40, 'Intrathecal Practice Optimization Strategy', 20, true, [255,255,255]);
-    text(left, H-60, 'Clinical Resource Allocation & Practice Growth Model', 9, false, [209,213,219]);
+    const wrap = (value, maxChars) => {
+        const words = String(value).split(/\s+/);
+        const lines = [];
+        let line = '';
+        for (const word of words) {
+            const candidate = line ? line + ' ' + word : word;
+            if (candidate.length > maxChars && line) {
+                lines.push(line);
+                line = word;
+            } else {
+                line = candidate;
+            }
+        }
+        if (line) lines.push(line);
+        return lines;
+    };
 
-    // Main white card
-    rect(left, 62, contentW, H-164, [255,255,255], [226,232,240], 0.8);
-    text(left+18, H-124, 'Practice Opportunity Summary', 12, true, [31,41,55]);
+    // Outer page/card — mirrors the printed summary: white page, clean navy header.
+    rect(0, 0, W, H, white);
+    rect(0, H - 76, W, 76, white);
+    text(margin, H - 32, 'Practice Summary', 18, true, navy);
+    text(margin, H - 52, 'Live summary based on the current calculator settings', 9, false, gray);
+    rect(margin, H - 76, contentW, 2, navy);
+
+    // Inner summary header — same navy/cyan visual language as the live summary.
+    let y = H - 108;
+    const headerH = 58;
+    rect(margin, y - headerH, contentW, headerH, navy);
+    text(margin + 18, y - 23, 'Intrathecal Practice Optimization Strategy', 16, true, white);
+    text(margin + 18, y - 42, 'Clinical Resource Allocation & Practice Growth Model', 8.5, false, [209, 213, 219]);
+    y -= headerH + 18;
+
+    // Opportunity card.
+    const cardTop = y;
+    const rowH = 27;
+    const cardH = 20 + rowH * 6;
+    rect(margin, cardTop - cardH, contentW, cardH, white, lightGray, 1);
+    text(margin + 14, cardTop - 16, 'Practice Opportunity Summary', 11, true, navy);
+    y = cardTop - 36;
 
     const rows = [
         ['Active pump patients', String(d.patients)],
@@ -817,41 +870,46 @@ function buildSummaryPdfBlob() {
         ['New billable opportunity', money(d.grossOpportunityRev)],
         ['RTM opportunity', rtmLine]
     ];
-    let y = H-150;
-    for (const [label,value] of rows) {
-        text(left+18, y, label, 9.5, true);
-        rightText(W-right-18, y, value, 9.5, false);
-        line(left+18, y-7, W-right-18, y-7);
-        y -= 27;
-    }
+    rows.forEach((row, i) => {
+        if (i > 0) rect(margin + 12, y + 7, contentW - 24, 0.7, lightGray);
+        text(margin + 14, y - 4, row[0], 8.5, true, dark);
+        const valueWidth = Math.max(100, row[1].length * 4.3);
+        text(W - margin - 14 - valueWidth, y - 4, row[1], 8.5, false, dark);
+        y -= rowH;
+    });
 
-    // Impact callout
-    const boxY = y - 3;
-    rect(left+18, boxY-58, contentW-36, 58, [255,247,204], [229,201,74], 0.8);
-    const impactLabel = 'ESTIMATED ANNUAL PRACTICE IMPACT';
-    const labelWidth = impactLabel.length * 6.1;
-    text((W-labelWidth)/2, boxY-22, impactLabel, 8.5, true, [107,91,0]);
-    const liftWidth = lift.length * 9;
-    text((W-liftWidth)/2, boxY-47, lift, 20, true, [15,44,89]);
+    y = cardTop - cardH - 16;
 
-    y = boxY - 31;
-    text(left+18, y, 'Operational benefits', 11, true);
-    y -= 18;
-    const bullets = [
+    // Impact callout — exactly the important visual treatment from the summary.
+    const impactH = 66;
+    rect(margin, y - impactH, contentW, impactH, yellow, yellowBorder, 1);
+    centeredText(y - 20, 'ESTIMATED ANNUAL PRACTICE IMPACT', 8, true, yellowLabel);
+    centeredText(y - 48, lift, 24, true, navy);
+    y -= impactH + 18;
+
+    // Operational benefits. Capacity created is already included in the opportunity table above.
+    text(margin + 4, y, 'Operational benefits', 10.5, true, navy);
+    y -= 17;
+    const benefits = [
         'Eliminates wheelchair & transit schedule delays',
         'Physician maintains telemetry & dosing control',
         '24/7 clinical pump on-call triage for off-hour alarms',
         'BHI manages compounding, specialty pharmacy, & delivery',
         'Payer pre-authorizations coordinated externally'
     ];
-    for (const bullet of bullets) {
-        text(left+22, y, '-', 9.5, true, [0,168,150]);
-        text(left+35, y, bullet, 9.5, false);
-        y -= 18;
-    }
+    benefits.forEach(item => {
+        text(margin + 8, y, '•', 9, true, cyan);
+        const wrapped = wrap(item, 92);
+        text(margin + 20, y, wrapped[0], 8.5, false, dark);
+        y -= 13;
+        for (let i = 1; i < wrapped.length; i++) {
+            text(margin + 20, y, wrapped[i], 8.5, false, dark);
+            y -= 11;
+        }
+        y -= 1;
+    });
 
-    y -= 2;
-    text(left+18, y, 'This summary is a model based on the calculator inputs and selected procedure assumptions.', 7.5, false, [107,114,128]);
+    text(margin + 4, Math.max(24, y - 2), 'This summary is a model based on the calculator inputs and selected procedure assumptions.', 7.5, false, gray);
 
     const stream = commands.join('\n');
     const objects = [];
@@ -862,7 +920,7 @@ function buildSummaryPdfBlob() {
     objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
     objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
 
-    let pdf = '%PDF-1.4\n%âãÏÓ\n';
+    let pdf = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n';
     const offsets = [0];
     objects.forEach((obj, i) => {
         offsets.push(pdf.length);
@@ -876,6 +934,7 @@ function buildSummaryPdfBlob() {
     pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
     return new Blob([pdf], {type:'application/pdf'});
 }
+
 function downloadSummaryPdf() {
     const blob = buildSummaryPdfBlob();
     const url = URL.createObjectURL(blob);
