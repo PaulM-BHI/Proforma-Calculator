@@ -665,7 +665,9 @@ function buildEmailSummaryHtml() {
     <div style="font-size:12px;color:#D1D5DB;margin-top:3px;">Clinical Resource Allocation & Practice Growth Model</div>
   </div>
   <div style="padding:20px;border:1px solid #E2E8F0;border-top:0;border-radius:0 0 10px 10px;">
-    <p style="margin-top:0;"><strong>Practice Opportunity Summary</strong></p>
+    <p style="margin-top:0;">Thank you for taking the time to review our intrathecal practice optimization strategy today.</p>
+    <p>Based on our discussion, I’ve summarized the projected impact of transitioning your maintenance pump refills to Basic Home Infusion (BHI) for in-home clinical management.</p>
+    <p style="margin-top:18px;"><strong>Practice Opportunity Summary</strong></p>
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Active pump patients</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.patients}</td></tr>
       <tr><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;"><strong>Patients transitioned</strong></td><td style="padding:8px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${d.transitionedPatients}</td></tr>
@@ -776,24 +778,27 @@ function buildSummaryPdfBlob() {
     const lines = [
         ['Intrathecal Practice Optimization Strategy', 18, true],
         ['Clinical Resource Allocation & Practice Growth Model', 9, false],
-        ['', 8, false],
+        ['', 7, false],
+        ['Thank you for taking the time to review our intrathecal practice optimization strategy today.', 9, false],
+        ['Based on our discussion, I’ve summarized the projected impact of transitioning your maintenance pump refills to Basic Home Infusion (BHI) for in-home clinical management.', 9, false],
+        ['', 7, false],
         ['Practice Opportunity Summary', 12, true],
         ['Active pump patients: ' + d.patients, 10, false],
         ['Patients transitioned: ' + d.transitionedPatients, 10, false],
         ['Clinical capacity recovered: ' + d.hoursRecovered.toFixed(1) + ' hrs / ' + d.daysRecovered.toFixed(1) + ' days', 10, false],
         ['New billable opportunity: ' + money(d.grossOpportunityRev), 10, false],
         ['RTM opportunity: ' + rtmLine, 10, false],
-        ['', 8, false],
+        ['', 7, false],
         ['Estimated Annual Practice Impact: ' + lift, 14, true],
         ['Capacity created: ' + slots, 10, false],
-        ['', 6, false],
+        ['', 14, false],
         ['Operational benefits', 12, true],
-        ['• Eliminates wheelchair & transit schedule delays', 10, false],
-        ['• Physician maintains telemetry & dosing control', 10, false],
-        ['• 24/7 clinical pump on-call triage for off-hour alarms', 10, false],
-        ['• BHI manages compounding, specialty pharmacy, & delivery', 10, false],
-        ['• Payer pre-authorizations coordinated externally', 10, false],
-        ['', 8, false],
+        ['- Eliminates wheelchair & transit schedule delays', 10, false],
+        ['- Physician maintains telemetry & dosing control', 10, false],
+        ['- 24/7 clinical pump on-call triage for off-hour alarms', 10, false],
+        ['- BHI manages compounding, specialty pharmacy, & delivery', 10, false],
+        ['- Payer pre-authorizations coordinated externally', 10, false],
+        ['', 7, false],
         ['This summary is a model based on the calculator inputs and selected procedure assumptions.', 8, false]
     ];
 
@@ -802,8 +807,10 @@ function buildSummaryPdfBlob() {
     for (const [text, size, bold] of lines) {
         if (text === '') { y -= size; continue; }
         const font = bold ? '/F2' : '/F1';
-        commands.push(`${font} ${size} Tf 54 ${y.toFixed(1)} Td (${pdfEscape(text)}) Tj`);
-        commands.push(`-${size} TL 0 -${size} Td`);
+        // Use an absolute text matrix for every line. The previous version
+        // used repeated relative Td movements, which could push most of the
+        // PDF content off the page and leave only the title visible.
+        commands.push(`${font} ${size} Tf 1 0 0 1 54 ${y.toFixed(1)} Tm (${pdfEscape(text)}) Tj`);
         y -= (size + 7);
         if (y < 45) break;
     }
