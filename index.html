@@ -347,6 +347,25 @@ APRN / Staff (62369)
 </div>
 <span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$142</span>
 </div>
+
+<!-- CUSTOM PHYSICIAN OPTION -->
+<div class="proc-card p-2.5 rounded-lg" id="custom-md-card" onclick="selectCustomProcedure(this)">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+<div>
+<p class="text-sm font-bold text-gray-800 mb-1">Other Exam / Procedure</p>
+<input type="text" id="custom-md-exam" value="" placeholder="Enter exam or procedure" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-white" onclick="event.stopPropagation()" oninput="updateCustomProcedure()">
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 mb-1">Time (min)</label>
+<input type="number" id="custom-md-time" value="" min="1" step="1" placeholder="Minutes" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-white" onclick="event.stopPropagation()" oninput="updateCustomProcedure()">
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 mb-1">$ Reimbursement</label>
+<input type="number" id="custom-md-rate" value="" min="0" step="1" placeholder="Dollars" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-white" onclick="event.stopPropagation()" oninput="updateCustomProcedure()">
+</div>
+</div>
+
+</div>
 </div>
 
 <!-- APRN / STAFF LIST -->
@@ -383,12 +402,22 @@ APRN / Staff (62369)
 <span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$120</span>
 </div>
 
-<div class="proc-card p-2.5 rounded-lg flex items-center justify-between" onclick="selectProcedure(36, 60, true, this)">
+<!-- CUSTOM APRN / STAFF OPTION -->
+<div class="proc-card p-2.5 rounded-lg" id="custom-app-card" onclick="selectCustomAppProcedure(this)">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
 <div>
-<p class="text-sm font-bold text-gray-800">Staff Hours Reallocated (New Tasks)</p>
-<p class="text-xs text-gray-500">Prior Auth, Triage & Flow • Estimated capacity value (~$36/hr basis)</p>
+<p class="text-sm font-bold text-gray-800 mb-1">Other Exam / Procedure</p>
+<input type="text" id="custom-app-exam" value="" placeholder="Enter exam or procedure" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-white" onclick="event.stopPropagation()" oninput="updateCustomAppProcedure()">
 </div>
-<span class="font-extrabold text-sm" style="color: var(--bhi-navy);">$36/hr</span>
+<div>
+<label class="block text-xs font-semibold text-gray-500 mb-1">Time (min)</label>
+<input type="number" id="custom-app-time" value="" min="1" step="1" placeholder="Minutes" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-white" onclick="event.stopPropagation()" oninput="updateCustomAppProcedure()">
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 mb-1">$ Reimbursement</label>
+<input type="number" id="custom-app-rate" value="" min="0" step="1" placeholder="Dollars" class="w-full p-1.5 text-xs border border-gray-300 rounded-md bg-white" onclick="event.stopPropagation()" oninput="updateCustomAppProcedure()">
+</div>
+</div>
 </div>
 </div>
 
@@ -533,6 +562,14 @@ const outNewSlots = document.getElementById('summary-new-slots');
 const outOpportunityRevenue = document.getElementById('summary-opportunity-revenue');
 const outOpportunityLabel = document.getElementById('summary-opportunity-label');
 const outPracticeLift = document.getElementById('summary-practice-lift');
+const customMdCard = document.getElementById('custom-md-card');
+const customMdExam = document.getElementById('custom-md-exam');
+const customMdTime = document.getElementById('custom-md-time');
+const customMdRate = document.getElementById('custom-md-rate');
+const customAppCard = document.getElementById('custom-app-card');
+const customAppExam = document.getElementById('custom-app-exam');
+const customAppTime = document.getElementById('custom-app-time');
+const customAppRate = document.getElementById('custom-app-rate');
 const outRtmHeaderLift = document.getElementById('rtm-header-lift');
 
 function toggleProviderModel(model) {
@@ -577,6 +614,44 @@ function selectProcedure(rate, mins, isSalaryFlag, element) {
     }
 
     calculate();
+}
+
+function selectCustomProcedure(element) {
+    const mins = Math.max(0, Number(customMdTime.value) || 0);
+    const rate = Math.max(0, Number(customMdRate.value) || 0);
+    currentProcMinutes = mins || 1;
+    currentProcRate = rate;
+    isSalary = false;
+
+    document.querySelectorAll('.proc-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    if (element) element.classList.add('selected');
+
+    calculate();
+}
+
+function updateCustomProcedure() {
+    selectCustomProcedure(customMdCard);
+}
+
+function selectCustomAppProcedure(element) {
+    const mins = Math.max(0, Number(customAppTime.value) || 0);
+    const rate = Math.max(0, Number(customAppRate.value) || 0);
+    currentProcMinutes = mins || 1;
+    currentProcRate = rate;
+    isSalary = false;
+
+    document.querySelectorAll('.proc-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    if (element) element.classList.add('selected');
+
+    calculate();
+}
+
+function updateCustomAppProcedure() {
+    selectCustomAppProcedure(customAppCard);
 }
 
 function setRtmOption(enabled) {
