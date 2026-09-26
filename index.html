@@ -748,8 +748,8 @@ function buildEmailSummaryHtml() {
         ? (d.newSlotsCreated + ' staff-capacity hours')
         : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots';
     const capacityMath = d.isSalary
-        ? `(${d.hoursRecovered.toFixed(1)} hrs / ${d.transitionedChairMinutes} min from reallocation opportunity)`
-        : `(${d.hoursRecovered.toFixed(1)} hrs / ${d.transitionedChairMinutes} min from reallocation opportunity)`;
+        ? `(${d.hoursRecovered.toFixed(1)} hrs / ${d.currentProcMinutes} min from reallocation opportunity)`
+        : `(${d.hoursRecovered.toFixed(1)} hrs / ${d.currentProcMinutes} min from reallocation opportunity)`;
     const clinicalMath = `(${d.transitionedRefills} patient refills transitioned × ${d.minutesPerRefill} min total chair time)`;
     const opportunityMath = `(${d.opportunityName} • ${d.currentProcMinutes} min • ${money(d.currentProcRate)} per opportunity)`;
     const lift = (d.netAnnualPracticeLift >= 0 ? '+' : '') + money(d.netAnnualPracticeLift);
