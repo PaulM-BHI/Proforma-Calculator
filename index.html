@@ -136,9 +136,9 @@ input[type=range] { accent-color: var(--bhi-cyan); }
 .proc-card { cursor: pointer; transition: all 0.15s ease; border: 2px solid #E2E8F0; }
 .proc-card:hover { border-color: var(--bhi-cyan); }
 .proc-card.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; }
-.rtm-opt-card { cursor: pointer; transition: all 0.15s ease; border: 2px solid #E2E8F0; }
-.rtm-opt-card:hover { border-color: var(--bhi-cyan); }
-.rtm-opt-card.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; }
+.ccm-opt-card { cursor: pointer; transition: all 0.15s ease; border: 2px solid #E2E8F0; }
+.ccm-opt-card:hover { border-color: var(--bhi-cyan); }
+.ccm-opt-card.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; }
 .provider-btn { cursor: pointer; transition: all 0.15s ease; border: 1.5px solid #CBD5E1; }
 .provider-btn.selected { border-color: var(--bhi-cyan); background-color: #F0FDFA; color: var(--bhi-navy); font-weight: 700; }
 
@@ -425,21 +425,21 @@ APRN / Staff (62369)
 </div>
 </div>
 
-<!-- 4. REMOTE THERAPEUTIC MONITORING (RTM) -->
+<!-- 4. CHRONIC CARE MANAGEMENT (CCM) -->
 <div class="p-6 bhi-card mb-6">
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-2 border-b-2" style="border-color: var(--bhi-cyan);">
-<h2 class="text-lg font-bold tracking-wide" style="color: var(--bhi-navy);">4. REMOTE THERAPEUTIC MONITORING (RTM)</h2>
-<div id="rtm-header-lift" class="text-sm font-extrabold" style="color: var(--bhi-cyan);">Estimated Lift: $0/year (Unselected)</div>
+<h2 class="text-lg font-bold tracking-wide" style="color: var(--bhi-navy);">4. CHRONIC CARE MANAGEMENT (CCM)</h2>
+<div id="ccm-header-lift" class="text-sm font-extrabold" style="color: var(--bhi-cyan);">Estimated Lift: $0/year (Unselected)</div>
 </div>
 
 <div class="text-xs text-gray-600 mb-4">
-<div>RTM Program</div>
+<div>CCM Program</div>
 <div class="text-gray-500 mt-0.5">Provides continuous therapy adherence and monitoring.</div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<!-- Option 1: Standard (No RTM) -->
-<div id="rtm-opt-none" class="rtm-opt-card selected p-4 rounded-lg flex items-center justify-between" onclick="setRtmOption(false)">
+<!-- Option 1: Standard (No CCM) -->
+<div id="ccm-opt-none" class="ccm-opt-card selected p-4 rounded-lg flex items-center justify-between" onclick="setRtmOption(false)">
 <div>
 <p class="text-sm font-bold text-gray-800">Standard Practice Protocol</p>
 <p class="text-xs text-gray-500 mt-0.5">In-office follow-up only</p>
@@ -448,14 +448,14 @@ APRN / Staff (62369)
 <span class="font-bold text-sm text-gray-400">$0/mo</span>
 </div>
 
-<!-- Option 2: Suremed RTM Enabled -->
-<div id="rtm-opt-active" class="rtm-opt-card p-4 rounded-lg flex items-center justify-between" onclick="setRtmOption(true)">
+<!-- Option 2: Suremed CCM Enabled -->
+<div id="ccm-opt-active" class="ccm-opt-card p-4 rounded-lg flex items-center justify-between" onclick="setRtmOption(true)">
 <div>
-<p class="text-sm font-bold text-gray-800">Add RTM Program</p>
-<p class="text-xs text-gray-500 mt-0.5">CPT 98977 • CPT 98980</p>
-<p class="text-xs text-gray-400">Remote adherence telemetry</p>
+<p class="text-sm font-bold text-gray-800">Add CCM Program</p>
+<p class="text-xs text-gray-500 mt-0.5">CPT 99490 • CPT 99491</p>
+<p class="text-xs text-gray-400">Monthly chronic care coordination & management</p>
 </div>
-<span class="font-extrabold text-sm" style="color: var(--bhi-cyan);">+$70/pt/mo</span>
+<span class="font-extrabold text-sm" style="color: var(--bhi-cyan);">+$33.33/pt/mo</span>
 </div>
 </div>
 </div>
@@ -530,7 +530,7 @@ APRN / Staff (62369)
 let currentProcRate = 127;
 let currentProcMinutes = 30;
 let isSalary = false;
-let rtmActive = false;
+let ccmActive = false;
 
 const currencyFmt = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -570,7 +570,7 @@ const customAppCard = document.getElementById('custom-app-card');
 const customAppExam = document.getElementById('custom-app-exam');
 const customAppTime = document.getElementById('custom-app-time');
 const customAppRate = document.getElementById('custom-app-rate');
-const outRtmHeaderLift = document.getElementById('rtm-header-lift');
+const outRtmHeaderLift = document.getElementById('ccm-header-lift');
 
 function toggleProviderModel(model) {
     const btnMd = document.getElementById('btn-prov-md');
@@ -655,10 +655,10 @@ function updateCustomAppProcedure() {
 }
 
 function setRtmOption(enabled) {
-    rtmActive = Boolean(enabled);
+    ccmActive = Boolean(enabled);
 
-    document.getElementById('rtm-opt-none').classList.toggle('selected', !rtmActive);
-    document.getElementById('rtm-opt-active').classList.toggle('selected', rtmActive);
+    document.getElementById('ccm-opt-none').classList.toggle('selected', !ccmActive);
+    document.getElementById('ccm-opt-active').classList.toggle('selected', ccmActive);
 
     calculate();
 }
@@ -721,11 +721,11 @@ function getSummaryData() {
         newSlotsCreated = Math.floor((hoursRecovered * 60) / currentProcMinutes);
         grossOpportunityRev = newSlotsCreated * currentProcRate;
     }
-    const rtmAnnualPotential = transitionedPatients * 70 * 12;
-    const rtmRevenueApplied = rtmActive ? rtmAnnualPotential : 0;
+    const ccmAnnualPotential = transitionedPatients * 400;
+    const ccmRevenueApplied = ccmActive ? ccmAnnualPotential : 0;
     // Only the refill margin associated with transitioned patients leaves the practice.
     const netRefillMarginSurrendered = transitionedRefills * (refillCharge - kitCost);
-    const reallocationAnnualValue = grossOpportunityRev + rtmRevenueApplied;
+    const reallocationAnnualValue = grossOpportunityRev + ccmRevenueApplied;
     const netAnnualPracticeLift = reallocationAnnualValue - netRefillMarginSurrendered;
     const selectedOpportunity = document.querySelector('.proc-card.selected');
     const opportunityName = selectedOpportunity
@@ -734,7 +734,7 @@ function getSummaryData() {
     return {
         patients, refillsPerYear, minutesPerRefill, transitionedPatients, transitionedRefills,
         transitionedChairMinutes, hoursRecovered, daysRecovered, newSlotsCreated,
-        grossOpportunityRev, rtmAnnualPotential, rtmRevenueApplied,
+        grossOpportunityRev, ccmAnnualPotential, ccmRevenueApplied,
         netRefillMarginSurrendered, reallocationAnnualValue, netAnnualPracticeLift,
         isSalary, currentProcRate, currentProcMinutes, opportunityName
     };
@@ -743,7 +743,7 @@ function getSummaryData() {
 function buildEmailSummaryHtml() {
     const d = getSummaryData();
     const money = value => currencyFmt.format(value);
-    const rtmLine = rtmActive ? ('+' + money(d.rtmRevenueApplied) + '/year') : 'Not selected';
+    const ccmLine = ccmActive ? ('+' + money(d.ccmRevenueApplied) + '/year') : 'Not selected';
     const slots = d.isSalary
         ? (d.newSlotsCreated + ' staff-capacity hours')
         : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots';
@@ -778,7 +778,7 @@ function buildEmailSummaryHtml() {
         <td style="padding:6px 10px;border-bottom:1px solid #E5E7EB;"><strong>New Billable Opportunity</strong><div style="font-size:11px;font-weight:400;color:#6B7280;">${opportunityMath}</div></td>
         <td style="padding:6px 10px;border-bottom:1px solid #E5E7EB;text-align:right;">${'+' + money(d.grossOpportunityRev) + ' /year'}</td>
       </tr>
-      <tr><td style="padding:6px 10px;"><strong>RTM Opportunity</strong></td><td style="padding:6px 10px;text-align:right;">${rtmLine}</td></tr>
+      <tr><td style="padding:6px 10px;"><strong>CCM Opportunity</strong></td><td style="padding:6px 10px;text-align:right;">${ccmLine}</td></tr>
     </table>
     <div style="margin:14px 0;padding:14px;background:#FFF7CC;border:1px solid #E5C94A;border-radius:8px;text-align:center;">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:#6B5B00;">Estimated Annual Practice Impact</div>
@@ -861,7 +861,7 @@ function emailBodyText() {
     const opportunityMath = `(${d.opportunityName} • ${d.currentProcMinutes} min • ${currencyFmt.format(d.currentProcRate)} per opportunity)`;
     const capacityMath = `(${d.hoursRecovered.toFixed(1)} hrs / ${d.transitionedChairMinutes} min from reallocation opportunity)`;
     const impactMath = `(${currencyFmt.format(d.reallocationAnnualValue)} reallocation - ${currencyFmt.format(d.netRefillMarginSurrendered)} current)`;
-    return `Thank you for taking the time to review our intrathecal practice optimization strategy today.\n\nBased on our discussion, I’ve summarized the projected impact of transitioning your maintenance pump refills to Basic Home Infusion (BHI) for in-home clinical management.\n\nIntrathecal Practice Optimization Strategy\n\nPractice Opportunity Summary\nActive Pump Patients: ${d.patients}\nPatient Refills Transitioned: ${d.transitionedPatients}\nClinic Time Recovered: ${d.hoursRecovered.toFixed(1)} hours / ${d.daysRecovered.toFixed(1)} full days ${clinicalMath}\nClinical Capacity Created: ${d.isSalary ? (d.newSlotsCreated + ' staff-capacity hours') : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots'} ${capacityMath}\nNew Billable Opportunity: ${currencyFmt.format(d.grossOpportunityRev)} ${opportunityMath}\nRTM Opportunity: ${rtmActive ? '+' + currencyFmt.format(d.rtmRevenueApplied) + '/year' : 'Not selected'}\n\nESTIMATED ANNUAL PRACTICE IMPACT: ${lift}\n${impactMath}\n\nOperational benefits\n• Eliminates wheelchair & transit schedule delays\n• Physician maintains telemetry & dosing control\n• 24/7 clinical pump on-call triage for off-hour alarms\n• BHI manages compounding, specialty pharmacy, & delivery\n• Payer pre-authorizations coordinated externally`;
+    return `Thank you for taking the time to review our intrathecal practice optimization strategy today.\n\nBased on our discussion, I’ve summarized the projected impact of transitioning your maintenance pump refills to Basic Home Infusion (BHI) for in-home clinical management.\n\nIntrathecal Practice Optimization Strategy\n\nPractice Opportunity Summary\nActive Pump Patients: ${d.patients}\nPatient Refills Transitioned: ${d.transitionedPatients}\nClinic Time Recovered: ${d.hoursRecovered.toFixed(1)} hours / ${d.daysRecovered.toFixed(1)} full days ${clinicalMath}\nClinical Capacity Created: ${d.isSalary ? (d.newSlotsCreated + ' staff-capacity hours') : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots'} ${capacityMath}\nNew Billable Opportunity: ${currencyFmt.format(d.grossOpportunityRev)} ${opportunityMath}\nCCM Opportunity: ${ccmActive ? '+' + currencyFmt.format(d.ccmRevenueApplied) + '/year' : 'Not selected'}\n\nESTIMATED ANNUAL PRACTICE IMPACT: ${lift}\n${impactMath}\n\nOperational benefits\n• Eliminates wheelchair & transit schedule delays\n• Physician maintains telemetry & dosing control\n• 24/7 clinical pump on-call triage for off-hour alarms\n• BHI manages compounding, specialty pharmacy, & delivery\n• Payer pre-authorizations coordinated externally`;
 }
 
 function pdfEscape(value) {
@@ -876,7 +876,7 @@ function buildSummaryPdfBlob() {
     const d = getSummaryData();
     const money = value => currencyFmt.format(value);
     const lift = (d.netAnnualPracticeLift >= 0 ? '+' : '') + money(d.netAnnualPracticeLift);
-    const rtmLine = rtmActive ? ('+' + money(d.rtmRevenueApplied) + '/year') : 'Not selected';
+    const ccmLine = ccmActive ? ('+' + money(d.ccmRevenueApplied) + '/year') : 'Not selected';
     const slots = d.isSalary
         ? (d.newSlotsCreated + ' staff-capacity hours')
         : d.newSlotsCreated.toLocaleString('en-US') + ' billable slots';
@@ -980,7 +980,7 @@ function buildSummaryPdfBlob() {
         ['Clinic Time Recovered', `${d.hoursRecovered.toFixed(1)} hrs / ${d.daysRecovered.toFixed(1)} days`, clinicalMath],
         ['Clinical Capacity Created', slots, capacityMath],
         ['New Billable Opportunity', '+' + money(d.grossOpportunityRev) + ' /year', opportunityMath],
-        ['RTM Opportunity', rtmLine, '']
+        ['CCM Opportunity', ccmLine, '']
     ];
     rows.forEach((row, i) => {
         if (i > 0) rect(margin + 12, y + 7, contentW - 24, 0.7, lightGray);
@@ -1143,21 +1143,21 @@ function calculate() {
         grossOpportunityRev = newSlotsCreated * currentProcRate;
     }
 
-    // SECTION 4 — REMOTE THERAPEUTIC MONITORING (RTM)
-    const rtmAnnualPotential = transitionedPatients * 70 * 12;
-    const rtmRevenueApplied = rtmActive ? rtmAnnualPotential : 0;
+    // SECTION 4 — CHRONIC CARE MANAGEMENT (CCM)
+    const ccmAnnualPotential = transitionedPatients * 400;
+    const ccmRevenueApplied = ccmActive ? ccmAnnualPotential : 0;
 
-    if (rtmActive) {
-        outRtmHeaderLift.textContent = 'Active Lift: +' + currencyFmt.format(rtmAnnualPotential) + '/year (' + currencyFmt.format(rtmAnnualPotential / 12) + '/mo)';
+    if (ccmActive) {
+        outRtmHeaderLift.textContent = 'Active Lift: +' + currencyFmt.format(ccmAnnualPotential) + '/year (' + currencyFmt.format(ccmAnnualPotential / 12) + '/mo)';
         outRtmHeaderLift.style.color = '#00A896';
     } else {
-        outRtmHeaderLift.textContent = 'Estimated Potential: +' + currencyFmt.format(rtmAnnualPotential) + '/year (Unselected)';
+        outRtmHeaderLift.textContent = 'Estimated Potential: +' + currencyFmt.format(ccmAnnualPotential) + '/year (Unselected)';
         outRtmHeaderLift.style.color = '#9CA3AF';
     }
 
-    // NET PRACTICE LIFT = procedure revenue + RTM revenue - surrendered refill margin
+    // NET PRACTICE LIFT = procedure revenue + CCM revenue - surrendered refill margin
     const netRefillMarginSurrendered = currentNetAnnual * transitionPct;
-    const netAnnualPracticeLift = (grossOpportunityRev + rtmRevenueApplied) - netRefillMarginSurrendered;
+    const netAnnualPracticeLift = (grossOpportunityRev + ccmRevenueApplied) - netRefillMarginSurrendered;
 
     // UPDATE SUMMARY
     outNewSlots.textContent = isSalary ? (newSlotsCreated + ' hrs') : newSlotsCreated;
